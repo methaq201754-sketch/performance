@@ -5,16 +5,10 @@ import { EVALUATION_ROLES } from './evaluationForms';
 import EvaluationScreen from './EvaluationScreen';
 
 export default function App() {
-  // حالة الموظف المختار لإجراء التقييم له
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-  
-  // حالة الطرف المُقَيِّم الحالي (الافتراضي: تقييم ذاتي)
   const [currentRole, setCurrentRole] = useState('self');
-
-  // سجل التقييمات المخزنة: { [employeeId]: { self: 85, manager: 90, subordinate: 80, peer: 85 } }
   const [evaluationsRecord, setEvaluationsRecord] = useState({});
 
-  // دالة حفظ التقييم من شاشة EvaluationScreen
   const handleSaveEvaluation = (evalData) => {
     setEvaluationsRecord(prev => {
       const empEvals = prev[evalData.employeeId] || {};
@@ -26,10 +20,9 @@ export default function App() {
         }
       };
     });
-    setSelectedEmployee(null); // العودة للقائمة الرئيسية بعد الحفظ
+    setSelectedEmployee(null);
   };
 
-  // دالة حساب المتوسط العام لتقييم 360 درجة لموظف معين
   const calculateOverallAverage = (employeeId) => {
     const empEvals = evaluationsRecord[employeeId];
     if (!empEvals) return null;
@@ -41,11 +34,9 @@ export default function App() {
     return (sum / scores.length).toFixed(1);
   };
 
-  // شاشة إجراء التقييم عند اختيار موظف
   if (selectedEmployee) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#f4f6f9' }}>
-        {/* شريط علوي للعودة واختيار طرف التقييم */}
         <View style={styles.topBar}>
           <TouchableOpacity onPress={() => setSelectedEmployee(null)} style={styles.backButton}>
             <Text style={styles.backButtonText}>← العودة للقائمة</Text>
@@ -53,7 +44,6 @@ export default function App() {
           <Text style={styles.topBarTitle}>إجراء تقييم أداء</Text>
         </View>
 
-        {/* أزرار اختيار صفة المُقَيِّم (ذاتي / رئيس / مرؤوس / زميل) */}
         <View style={styles.roleSelectorContainer}>
           <Text style={styles.roleSelectorLabel}>اختر صفة المُقَيِّم الآن:</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.roleScroll}>
@@ -80,18 +70,15 @@ export default function App() {
     );
   }
 
-  // الشاشة الرئيسية: قائمة الموظفين
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1e293b" />
       
-      {/* الترويسة الرئيسية */}
       <View style={styles.header}>
         <Text style={styles.appTitle}>نظام تقييمات الأداء 360°</Text>
         <Text style={styles.appSubtitle}>سجل الموظفين ومتابعة متوسط التقييم السنوي</Text>
       </View>
 
-      {/* قائمة الموظفين */}
       <FlatList
         data={EMPLOYEES}
         keyExtractor={item => item.id}
@@ -109,7 +96,6 @@ export default function App() {
                 <Text style={styles.empSubDetails}>{item.department} - {item.administration}</Text>
               </View>
 
-              {/* قسم متوسط النتيجة والتفاصيل */}
               <View style={styles.statusRow}>
                 <View style={styles.badgeBox}>
                   <Text style={styles.badgeLabel}>التقييمات المكتملة:</Text>
