@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { EVALUATION_FORMS, EVALUATION_ROLES } from './evaluationForms';
+import { EVALUATION_FORMS } from './evaluationForms';
 
 export default function EvaluationScreen({ employee, onSaveEvaluation, currentEvaluatorRole }) {
-  // الحصول على الاستمارة المناسبة للموظف بناءً على نوع وظيفته
   const activeForm = EVALUATION_FORMS[employee.formType] || EVALUATION_FORMS.administrative;
-  
-  // تخزين الدرجات المختارة لكل معيار (الافتراضي 0 لكل معيار)
   const [scores, setScores] = useState({});
 
-  // تحديث درجة معيار معين (من 1 إلى 5)
   const handleScoreChange = (criterionId, scoreValue) => {
     setScores(prev => ({
       ...prev,
@@ -17,7 +13,6 @@ export default function EvaluationScreen({ employee, onSaveEvaluation, currentEv
     }));
   };
 
-  // حساب النتيجة المئوية لهذه الاستمارة الحالية
   const calculateCurrentFormPercentage = () => {
     const totalCriteria = activeForm.criteria.length;
     const maxPossibleScore = totalCriteria * 5;
@@ -28,7 +23,6 @@ export default function EvaluationScreen({ employee, onSaveEvaluation, currentEv
     return ((currentSum / maxPossibleScore) * 100).toFixed(1);
   };
 
-  // حفظ التقييم الحالي
   const handleSave = () => {
     const answeredCount = Object.keys(scores).length;
     if (answeredCount < activeForm.criteria.length) {
@@ -50,7 +44,6 @@ export default function EvaluationScreen({ employee, onSaveEvaluation, currentEv
 
   return (
     <ScrollView style={styles.container}>
-      {/* رأس شاشة التقييم وبيانات الموظف */}
       <View style={styles.headerCard}>
         <Text style={styles.employeeName}>{employee.name}</Text>
         <Text style={styles.employeeMeta}>{employee.jobTitle} - {employee.jobGrade}</Text>
@@ -60,14 +53,12 @@ export default function EvaluationScreen({ employee, onSaveEvaluation, currentEv
         </View>
       </View>
 
-      {/* معايير التقييم */}
       <Text style={styles.sectionTitle}>معايير التقييم (اختر من 1 إلى 5):</Text>
       {activeForm.criteria.map((criterion, index) => (
         <View key={criterion.id} style={styles.criterionCard}>
           <Text style={styles.criterionTitle}>{index + 1}. {criterion.title}</Text>
           <Text style={styles.criterionDesc}>{criterion.description}</Text>
 
-          {/* أزرار تقييم الدرجات من 1 إلى 5 */}
           <View style={styles.scoreRow}>
             {[1, 2, 3, 4, 5].map((val) => {
               const isSelected = scores[criterion.id] === val;
@@ -87,7 +78,6 @@ export default function EvaluationScreen({ employee, onSaveEvaluation, currentEv
         </View>
       ))}
 
-      {/* نتيجة الاستمارة الحالية وحفظ */}
       <View style={styles.summaryCard}>
         <Text style={styles.summaryText}>درجة الاستمارة الحالية:</Text>
         <Text style={styles.percentageText}>{calculateCurrentFormPercentage()}%</Text>
