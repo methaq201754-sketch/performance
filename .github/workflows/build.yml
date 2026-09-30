@@ -1,14 +1,16 @@
-name: Build Android APK
+name: Build Android APK (Pure GitHub)
 
 on:
   push:
     branches:
       - main
       - master
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v3
@@ -18,13 +20,26 @@ jobs:
         with:
           node-version: 18
 
-      - name: 🏗 Setup EAS CLI
-        run: npm install -g eas-cli
+      - name: ☕ Setup Java JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: 📦 Install dependencies
         run: npm install
 
-      - name: 🚀 Build Android APK
-        run: eas build --platform android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      - name: 🛠 Generate Android Native Project
+        run: npx expo prebuild --platform android
+
+      - name: 🏗 Build APK with Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: 📤 Upload APK Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Performance-App-Release
+          path: android/app/build/outputs/apk/release/app-release.apk
